@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+
+	<body>
+		<canvas id="can" height="600" width="600" onclick="play(event)" style="background-image: url(img/bak.jpg);"></canvas>
+	</body>
+
+</html>
+
+<script>
+	var maps = new Array(15);
+	for(var i = 0; i < 15; i++) {
+		maps[i] = new Array(15);
+		for(var j = 0; j < 15; j++) {
+			maps[i][j] = 0;
+		}
+	}
+
+	var can = document.getElementById('can');
+	var ctx = can.getContext('2d');
+	ctx.strokeStyle = 'gray';
+	for(var i = 0; i < 15; i++) {
+		for(var j = 0; j < 15; j++) {
+			ctx.strokeRect(j * 40, i * 40, 40, 40);
+		}
+	}
+
+	var black = new Image();
+	var white = new Image();
+	black.src = "img/black.png";
+	white.src = "img/white.png";
+
+	var flag = false;
+	var count = 0;
+
+	function play(e) {
+		if(flag) {
+			return;
+		}
+		var leftOffset = 8;
+		var x = e.clientX - leftOffset;
+		var y = e.clientY - leftOffset;
+		var col = parseInt((x - 20) / 40) + 1;
+		var row = parseInt((y - 20) / 40) + 1;
+
+		if(maps[col][row] != 0) {
+			return;
+		}
+
+		if(count % 2 == 0) {
+
+			ctx.drawImage(black, col * 40 - 20, row * 40 - 20);
+			maps[col][row] = 1;
+			whowin(1, col, row);
+		} else {
+			ctx.drawImage(white, col * 40 - 20, row * 40 - 20);
+			maps[col][row] = 2;
+			whowin(2, col, row);
+		}
+		count++;
+	}
+
+	/*判断谁赢*/
+	function whowin(state, row, col) {
+		var orgrow = row;
+		var orgcol = col;
+		var res = 1;
+		var ser = 1;
+		var cot = 1;
+		var cou = 1
+			/*竖线*/
+		while(col - 1 > 0 && maps[row][col - 1] == state) {
+			res++;
+			col--;
+		}
+		/*横线*/
+		while(row - 1 > 0 && maps[row - 1][col] == state) {
+			ser++;
+			row--;
+		}
+		/*重新赋值*/
+		row = orgrow;
+		col = orgcol;
+		/*竖线*/
+		while(col + 1 < 15 && maps[row][col + 1] == state) {
+			res++;
+			col++;
+		}
+		/*横线*/
+		while(row + 1 < 15 && maps[row + 1][col] == state) {
+			ser++;
+			row++;
+		}
+		/*重新赋值*/
+		row = orgrow;
+		col = orgcol;
+		/*左斜角*/
+		while(col + 1 < 15 && row + 1 < 15 && maps[row + 1][col + 1] == state) {
+			col++;
+			row++;
+			cot++;
+		}
+		/*重新赋值*/
+		row = orgrow;
+		col = orgcol;
+		while(col - 1 > 0 && row - 1 > 0 && maps[row - 1][col - 1] == state) {
+			col--;
+			row--;
+			cot++;
+		}
+		/*重新赋值*/
+		row = orgrow;
+		col = orgcol;
+		/*右斜角*/
+		while(col - 1 > 0 && row + 1 < 15 && maps[row + 1][col - 1] == state) {
+			col--;
+			row++;
+			cou++;
+		}
+		/*重新赋值*/
+		row = orgrow;
+		col = orgcol;
+
+		while(col + 1 > 0 && row - 1 < 15 && maps[row - 1][col + 1] == state) {
+			col++;
+			row--;
+			cou++;
+		}
+
+		if(res >= 5 || ser >= 5 || cot >= 5 || cou >= 5) {
+			if(state == 1) {
+				alert("黑棋win！！");
+				setTimeout("init()", 2000);
+			} else {
+				alert("白棋win！！");
+				setTimeout("init()", 2000);
+			}
+		}
+
+	}
+	function init() {
+		location.reload(true);
+	}
+</script>
